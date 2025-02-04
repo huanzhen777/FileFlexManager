@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:${user.dir}/backend/interfaces/src/main/resources/data/db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=9092
+
+logging:
+  level:
+    com.huanzhen.fileflexmanager: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    org.apache.ibatis: DEBUG
+
+
+# 自定义配置
+app:
+  data:
+    path: /  # 文件管理的根目录
+  config:
+    path: ${user.dir}/backend/interfaces/src/main/resources/conf

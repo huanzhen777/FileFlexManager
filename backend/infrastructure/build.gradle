@@ -1,0 +1,35 @@
+ext {
+    flywayVersion = '11.1.0'
+    jwtVersion='0.12.5'
+}
+
+dependencies {
+    api project(':backend:domain')
+    api project(':backend:application')
+
+    // MyBatis-Plus 相关依赖设置为 api，因为可能需要在其他模块使用其注解和类
+    api 'com.baomidou:mybatis-plus-spring-boot3-starter'
+    api 'com.baomidou:mybatis-plus-extension'
+    //api 'com.baomidou:mybatis-plus-jsqlparser'
+
+    // 这些是实现细节，使用 implementation
+    implementation 'com.h2database:h2'
+    implementation 'commons-io:commons-io:2.11.0'
+
+    // 添加 Spring Security 和 JWT 依赖
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api "io.jsonwebtoken:jjwt-api:${jwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jwtVersion}"
+
+
+    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+} 

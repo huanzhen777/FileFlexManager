@@ -1,0 +1,168 @@
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// 添加聚合报告任务
+apply plugin: 'jacoco'
+
+task jacocoRootReport(type: JacocoReport) {
+    // 等待所有子项目配置完成后再设置依赖
+    afterEvaluate {
+        def testTasks = subprojects.findAll { it.path.startsWith(':backend') }
+            .collect { it.tasks.withType(Test) }
+            .flatten()
+        dependsOn testTasks
+        
+        def backendProjects = subprojects.findAll { it.path.startsWith(':backend') }
+        
+        additionalSourceDirs.setFrom files(backendProjects.collect { 
+            it.sourceSets.main.allSource.srcDirs 
+        })
+        sourceDirectories.setFrom files(backendProjects.collect { 
+            it.sourceSets.main.allSource.srcDirs 
+        })
+        classDirectories.setFrom files(backendProjects.collect { 
+            it.sourceSets.main.output 
+        })
+        executionData.setFrom files(backendProjects.collect {
+            file("${it.buildDir}/jacoco/test.exec")
+        })
+    }
+    
+    reports {
+        xml.required = true
+        csv.required = false
+        html.required = true
+        
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco/aggregated')
+    }
+    
+    doLast {
+        println "=========================================="
+        println "JaCoCo 聚合报告已生成:"
+        println "HTML报告路径: file://${reports.html.outputLocation.get().asFile}/index.html"
+        println "=========================================="
+    }
+}
+
+subprojects {
+    // 只对后端子项目应用这些配置
+    if (project.path.startsWith(':backend')) {
+        apply plugin: 'java'
+        apply plugin: 'jacoco'
+        
+        group = 'com.huanzhen'
+        version = '0.0.1-SNAPSHOT'
+
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(21)
+            }
+        }
+
+        dependencies {
+            testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+            testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.1'
+            testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+            testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+            testImplementation 'org.assertj:assertj-core:3.24.2'
+        }
+
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events "passed", "skipped", "failed"
+            }
+            finalizedBy jacocoTestReport
+        }
+
+        jacocoTestReport {
+            reports {
+                xml.required = true
+                html.required = true
+                csv.required = false
+            }
+            
+            afterEvaluate {
+                classDirectories.setFrom(files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: [
+                        // 数据对象
+                        '**/model/**',
+                        '**/entity/**',
+                        '**/dto/**',
+                        '**/vo/**',
+                        '**/req/**',
+                        '**/resp/**',
+                        '**/po/**',
+                        
+                        // 配置类
+                        '**/config/**',
+                        '**/configuration/**',
+                        
+                        // 自动生成的代码
+                        '**/convert/**',
+                        '**/converter/**',
+                        '**/assembler/**',
+                        '**/mapper/**',
+                        
+                        // 常量和枚举
+                        '**/constant/**',
+                        '**/enums/**',
+                        '**/constants/**',
+                        
+                        // 其他工具类
+                        '**/util/**',
+                        '**/utils/**',
+                        
+                        // 特定框架类
+                        '**/controller/**',
+                        '**/advice/**',
+                        '**/exception/**'
+                    ])
+                }))
+            }
+        }
+
+        jacocoTestCoverageVerification {
+            violationRules {
+                rule {
+                    // 排除相同的无逻辑类
+                    excludes = [
+                        '**/model/**',
+                        '**/entity/**',
+                        '**/dto/**',
+                        '**/vo/**',
+                        '**/req/**',
+                        '**/resp/**',
+                        '**/po/**',
+                        '**/config/**',
+                        '**/configuration/**',
+                        '**/convert/**',
+                        '**/converter/**',
+                        '**/assembler/**',
+                        '**/mapper/**',
+                        '**/constant/**',
+                        '**/enums/**',
+                        '**/constants/**',
+                        '**/util/**',
+                        '**/utils/**',
+                        '**/controller/**',
+                        '**/advice/**',
+                        '**/exception/**'
+                    ]
+                    
+                    limit {
+                        minimum = 0.5
+                    }
+                }
+            }
+        }
+    }
+}
+
+task buildAll {
+    dependsOn subprojects.collect { it.tasks.matching { task -> task.name == 'build' } }
+    dependsOn ':frontend:npmBuild'
+}

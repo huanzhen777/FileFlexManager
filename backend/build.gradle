@@ -1,0 +1,46 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.3' apply false
+    id 'io.spring.dependency-management' version '1.1.6' apply false
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'groovy'
+
+    dependencies {
+        // Spring Boot Web 应该设置为 api，因为控制器需要访问
+        api 'org.springframework.boot:spring-boot-starter-web'
+        
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        // MapStruct 应该设置为 api，因为映射类需要在模块间共享
+        api 'org.mapstruct:mapstruct:1.5.5.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+        // 测试依赖保持 testImplementation
+        testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
+        testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
+        testImplementation 'org.apache.groovy:groovy:4.0.15'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // Lombok
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "com.baomidou:mybatis-plus-bom:3.5.9"
+        }
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+}

@@ -1,0 +1,26 @@
+dependencies {
+    implementation project(':backend:domain')
+    implementation project(':backend:application')
+    implementation project(':backend:infrastructure')
+
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+} 
+
+bootJar {
+    enabled = true
+    mainClass.set('com.huanzhen.fileflexmanager.interfaces.FileFlexManagerApplication')
+}
+
+jar {
+    enabled = false
+} 
+
+test {
+    useJUnitPlatform()
+}
+
+// 确保资源处理任务在前端文件复制后执行
+processResources.dependsOn(':frontend:copyFrontendToBacked') 

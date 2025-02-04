@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password:
+  
+  h2:
+    console:
+      enabled: true
+      
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-disabled: false
+    clean-on-validation-error: true
+    
+  sql:
+    init:
+      mode: never
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.huanzhen.fileflexmanager: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    org.apache.ibatis: DEBUG
+
+# 应用配置
+app:
+  data:
+    path: ${java.io.tmpdir}/fileflexmanager-test  # 使用系统临时目录
+  filesystem:
+    umask: 022

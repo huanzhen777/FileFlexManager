@@ -1,0 +1,17 @@
+dependencies {
+    api 'com.alibaba.fastjson2:fastjson2:2.0.53'
+    api 'cn.hutool:hutool-all:5.8.33'
+    api 'org.apache.commons:commons-vfs2:2.9.0'
+
+    //后续应该移除
+    api 'com.baomidou:mybatis-plus-jsqlparser'
+
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+} 

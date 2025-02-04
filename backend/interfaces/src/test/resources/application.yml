@@ -1,0 +1,72 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: admin
+    password: admin
+  
+  h2:
+    console:
+      enabled: true      # 启用H2控制台
+      path: /h2-console  # 控制台路径
+      settings:
+        web-allow-others: true  # 允许远程访问控制台
+        trace: false    # 禁用跟踪输出
+        web-admin-password: admin  # 设置控制台管理密码
+
+  # 文件编码设置
+  mandatory-file-encoding: UTF-8
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+      enabled: true
+  # 消息编码设置
+  messages:
+    encoding: UTF-8
+  web:
+    resources:
+      static-locations: classpath:/static/
+  mvc:
+    static-path-pattern: /**
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}  # 默认使用dev配置
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    map-underscore-to-camel-case: true
+    useGeneratedKeys: true
+  global-config:
+    db-config:
+      id-type: AUTO
+      capital-mode: false
+      # 移除 column-format，使用更好的方式处理
+    banner: false
+  type-aliases-package: com.huanzhen.mynasctrlbackend.infrastructure.persistence.entity
+
+
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  tomcat:
+    uri-encoding: UTF-8
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
+    include-message: always
+    path: /error
+
+app:
+  filesystem:
+    # 默认 umask 值为 022
+    umask: 022

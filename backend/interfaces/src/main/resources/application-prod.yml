@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:/app/config/db/db;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+
+
+logging:
+  file:
+    path: /app/config/logs
+  level:
+    root: WARN
+    your.package.name: INFO
+
+# 自定义配置
+app:
+  data:
+    path: /app/data  # 文件管理的根目录
+  config:
+    path: /app/config/conf

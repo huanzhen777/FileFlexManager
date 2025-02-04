@@ -1,0 +1,149 @@
+PROJECT: {
+  name: "FileFlexManager",
+  type: "web_file_manager",
+  target: "linux_nas",
+  features: [
+    "file_operations",
+    "web_ui",
+    "mobile_first",
+    "multi_user",
+    "permission_control"
+  ]
+}
+
+TECH_STACK:
+backend: {jdk:21, spring_boot:3, gradle:multi-module, mybatis_plus, mapstruct, db:h2/sqlite, arch:ddd, deploy:docker}
+frontend: {vue:3, typescript, ui:vant, mobile_first:true, unified_api:config.ts}
+
+STRUCTURE:
+backend/
+  domain/ {event, model, repository, service, utils}
+  application/ {assembler, config, dto, event, scheduler, service}
+  infrastructure/ {
+    config, external, 
+    persistence/ {converter, entity, mapper, po, repository},
+    security, util,
+    task/ {handler},
+  }
+  interfaces/ {
+    src/main/
+      java/com.huanzhen.fileflexmanager.interfaces/ {
+        api/ {
+          advice/,
+          assembler/,
+          controller/
+        },
+        config/,
+        controller/,
+        convert/,
+        converter/,
+        exception/,
+        facade/,
+        model/ {
+          dto/,
+          req/,
+          resp/,
+          vo/
+        }
+      }
+      resources/ {
+        data/,
+        db.migration/,
+        static/,
+        application*.yml
+      }
+  }
+
+frontend/
+  src/ {
+    api/,
+    assets/,
+    components/,
+    router/,
+    stores/,
+    utils/,
+    views/
+  }
+  public/
+  dist/
+  config/ {
+    env/,
+    typescript/,
+    build/
+  }
+
+CORE_FEATURES:
+1. ddd: {
+  layers: [interfaces -> application -> domain <- infrastructure],
+  strict_boundaries: true,
+  domain_logic_isolation: true
+}
+
+2. mapstruct: {
+  type_safe: true,
+  auto_generated: true,
+  custom_rules: true,
+  mapping_layers: {
+    interfaces: "DTO <-> Domain",
+    infrastructure: "Domain <-> PO/Entity"
+  }
+}
+
+3. data_handling: {
+  models: [DTO, Domain, PO],
+  response: BaseResponse,
+  global_exception: true,
+  validation: unified
+}
+
+4. frontend_features: {
+  mobile_first: true,
+  component_based: vant,
+  type_safe: typescript,
+  api_handling: unified,
+  base_response: config.ts
+}
+
+5. deployment: {
+  container: docker,
+  os: linux,
+  persistence: h2/sqlite
+}
+
+CODE_STANDARDS:
+backend: {
+  exception: global_handler,
+  response: BaseResponse,
+  domain_events: true,
+  data_access: repository_pattern
+}
+frontend: {
+  api: composition,
+  types: typescript,
+  request: unified_handler,
+  response: config.ts,
+  import_paths: alias_only
+}
+
+TEST_SPECS:
+framework: junit5
+naming: "*Test.java"
+location: "src/test/java/{package}"
+coverage: {
+  core_logic: required,
+  mock_external: true,
+  scenarios: [success, failure]
+}
+structure: {
+  format: "@Test methods",
+  naming: "camelCase",
+  setup: "@BeforeEach"
+}
+
+integration_tests: {
+  location: "backend/interfaces/src/test/java",
+  naming: "*IntegrationTest.java",
+  config: "TestConfig.java",
+}
+
+ENV: {docker: true, gradle: true, git: true}

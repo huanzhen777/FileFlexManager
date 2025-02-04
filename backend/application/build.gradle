@@ -1,0 +1,15 @@
+dependencies {
+    api project(':backend:domain')
+    api 'org.springframework:spring-context'
+    api 'org.springframework.boot:spring-boot-starter'
+    api 'org.springframework.boot:spring-boot-starter-jdbc'
+    api 'org.apache.commons:commons-compress:1.25.0'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+} 

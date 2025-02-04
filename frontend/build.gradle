@@ -1,0 +1,45 @@
+plugins {
+    id "com.github.node-gradle.node" version "7.0.2"
+}
+
+node {
+    version = '22.11.0'
+    npmVersion = '10.9.0'
+    download = true
+    workDir = file("${project.projectDir}/node")
+    npmWorkDir = file("${project.projectDir}/node")
+    distBaseUrl = 'https://npmmirror.com/dist'
+    npmCommand = 'install'
+}
+
+tasks.withType(com.github.gradle.node.npm.task.NpmTask).configureEach {
+    environment = [
+        'npm_config_registry': 'https://registry.npmmirror.com',
+        'npm_config_disturl': 'https://npmmirror.com/dist'
+    ]
+}
+
+task npmDev(type: NpmTask) {
+    dependsOn npmInstall
+    args = ['run', 'dev', '--debug']
+}
+
+task npmBuild(type: NpmTask) {
+    dependsOn npmInstall
+    args = ['run', 'build']
+}
+
+task clean(type: Delete) {
+    delete 'dist'
+    delete 'node_modules'
+}
+
+task copyFrontendToBacked(type: Copy) {
+    dependsOn npmBuild
+    from 'dist'
+    into '../backend/interfaces/src/main/resources/static'
+}
+
+task build {
+    dependsOn copyFrontendToBacked
+} 

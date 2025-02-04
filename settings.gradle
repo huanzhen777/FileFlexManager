@@ -1,0 +1,11 @@
+rootProject.name = 'FileFlexManager'
+
+// 后端模块
+include 'backend'
+include 'backend:domain'
+include 'backend:application'
+include 'backend:infrastructure'
+include 'backend:interfaces'
+
+// 前端模块
+include 'frontend'

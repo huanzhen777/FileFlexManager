@@ -1,0 +1,91 @@
+### Gradle ###
+.gradle/
+build/
+**/build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+**/out/
+
+### VS Code ###
+.vscode/*
+!.vscode/extensions.json
+
+### Mac OS ###
+.DS_Store
+**/.DS_Store
+
+### Java ###
+# 编译文件
+*.class
+
+# 日志文件
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+!gradle/wrapper/gradle-wrapper.jar
+
+### Frontend ###
+# Dependencies
+**/node_modules/
+
+# 构建产物
+**/dist/
+**/dist-ssr/
+
+# 本地环境文件
+**/*.local
+
+# 日志
+**/logs
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# 测试覆盖率
+**/coverage/
+
+# Cypress
+**/cypress/videos/
+**/cypress/screenshots/
+
+# TypeScript
+*.tsbuildinfo
+
+### Spring Boot ###
+HELP.md
+.springBeans
+.sts4-cache
+
+### 其他 ###
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+frontend/node/*
+**/bin/*
+backend/interfaces/src/main/resources/static/*
+backend/interfaces/src/main/resources/data/*.db
+
+# local env files
+*.local
+.env.local
+.env.*.local

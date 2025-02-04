@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  file-manager:
+    build:
+      context: .
+      args:
+        - USER_ID=${USER_ID:-1000}
+        - GROUP_ID=${GROUP_ID:-1000}
+    container_name: file-manager
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./docker/config:/app/config  # 应用配置和数据
+      - ./docker/data:/app/data      # 文件管理目录
+    environment:
+      - SERVER_PORT=8080
+    restart: unless-stopped 
