@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  file-manager:
+  FileFlexManager:
     build:
       context: .
       args:
         - USER_ID=${USER_ID:-1000}
         - GROUP_ID=${GROUP_ID:-1000}
-    container_name: file-manager
+    container_name: FileFlexManager
     ports:
       - "8080:8080"
     volumes:
