@@ -39,7 +39,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     bash \
     curl \
-    sqlite3 \
     rsync \
     && rm -rf /var/lib/apt/lists/*
 
