@@ -47,11 +47,7 @@ public class Task {
         this.cronExpression = cronExpression;
         this.enabled = true;
         this.executeCount = 0;
-        if (payload.getBoolean("executeNow")) {
-            this.nextExecuteTime = LocalDateTime.now();
-        } else {
-            this.nextExecuteTime = CronUtils.getNextExecuteTime(cronExpression);
-        }
+        this.nextExecuteTime = CronUtils.getNextExecuteTime(cronExpression);
     }
 
     public void updateProgress(int progress, String message) {

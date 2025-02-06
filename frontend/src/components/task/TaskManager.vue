@@ -332,22 +332,6 @@ const getProgressColor = (task: Task | null) => {
   }
 }
 
-// 进度文本
-const getProgressText = (task: Task | null) => {
-  if (!task) return '0%'
-  if (task.status === 'COMPLETED') return '完成'
-  if (task.status === 'FAILED') return '失败'
-  if (task.status === 'CANCELLED') return '取消'
-  if (task.progress === -1) return '进行中'
-  return `${task.progress}%`
-}
-
-// 格式化任务信息
-const formatTaskInfo = (task: Task) => {
-  const time = task.status === 'COMPLETED' ? task.endTime : task.beginTime
-  return `${task.typeDesc} | ${formatTime(time)}`
-}
-
 // 格式化时间
 const formatTime = (timestamp?: number) => {
   if (!timestamp) return '-'
