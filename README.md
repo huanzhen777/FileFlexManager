@@ -62,6 +62,7 @@ docker run -d \
 
 - /app/data 为文件管理根目录
 - /app/config 为配置目录
+- USER_ID GROUP_ID 为 uid gid 默认为1000 1000
 
 
 
