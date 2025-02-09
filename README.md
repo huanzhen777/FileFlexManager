@@ -8,10 +8,10 @@ Web 文件管理器，主要是方便管理nas上的文件，我有一台nas，�
   - 专为手机使用场景优化
   - 全局活动抽屉，方便快速跳转,任意界面右滑滑出
   - 注：电脑端需调整浏览器窗口至手机尺寸以获得最佳体验
-- 🏷️ 智能文件标签系统
+- 🏷️ 文件标签系统
   - 支持标签绑定文件内容
   - 相同内容文件自动关联标签
-  - 基于标签快速浏览和管理文件
+  - 基于标签快速浏览搜索文件
 - 🔍 支持文件索引，快速搜索
 - 🎯 任务管理系统
   - 文件操作任务化（复制、移动等绝大部分重文件操作）
@@ -46,7 +46,7 @@ Web 文件管理器，主要是方便管理nas上的文件，我有一台nas，�
 
 当前只建议通过docker 安装
 ```
-docker pull fileflexmanager/fileflexmanager:latest
+docker pull huanzhen7777/fileflexmanager:latest
 
 docker run -d \
   --name FileFlexManager \
