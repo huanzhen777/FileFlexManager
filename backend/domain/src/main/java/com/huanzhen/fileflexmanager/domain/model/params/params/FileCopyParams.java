@@ -21,4 +21,12 @@ public class FileCopyParams {
             type = ParamType.FOLDER
     )
     private String targetDir;
+
+    @ParamMeta(
+            name = "同步删除",
+            description = "是否同步删除操作，原文件夹删除的文件，目标文件夹也会删除",
+            type = ParamType.BOOLEAN,
+            required = false
+    )
+    private Boolean syncDelete = false;
 } 

@@ -67,6 +67,7 @@ public class FileCopyTaskHandler extends BaseTaskHandler<FileCopyParams> {
                 .verbose(true)
                 .showProgress(true)
                 .removeSource(false)
+                .syncDelete(params.getSyncDelete())
                 .build();
 
         RsyncExecutor.RsyncProgress progress = rsyncExecutor.execute(options, (rsyncProgress) -> {

@@ -31,6 +31,7 @@ public class RsyncExecutor {
         private boolean showProgress;
         private List<String> additionalOptions;
         private boolean removeSource;  // 用于move操作
+        private boolean syncDelete;
     }
 
     @Data
@@ -187,6 +188,10 @@ public class RsyncExecutor {
 
         if (options.getAdditionalOptions() != null) {
             command.addAll(options.getAdditionalOptions());
+        }
+
+        if (options.isSyncDelete()) {
+            command.add("--delete");
         }
 
         // 添加所有源路径
