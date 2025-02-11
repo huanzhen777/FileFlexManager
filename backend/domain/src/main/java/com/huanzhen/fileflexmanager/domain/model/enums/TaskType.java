@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 public enum TaskType {
-    FILE_COPY("文件复制", true, FileCopyParams.class),
+    FILE_COPY("文件复制", true, FileCopyParams.class, true),
     FILE_MOVE("文件移动", true, FileMoveParams.class),
     FILE_DELETE("文件删除", true, FileDeleteParams.class),
     FILE_CHANGE_OWNER("文件用户修改", false, FileChangeOwnerParams.class),

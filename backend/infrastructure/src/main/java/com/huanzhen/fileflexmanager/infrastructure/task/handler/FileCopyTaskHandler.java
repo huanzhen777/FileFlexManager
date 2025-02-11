@@ -21,10 +21,10 @@ import java.util.List;
 @Slf4j
 @Scope("prototype")
 @Component
-public class RsyncTaskHandler extends BaseTaskHandler<FileCopyParams> {
+public class FileCopyTaskHandler extends BaseTaskHandler<FileCopyParams> {
     private final RsyncExecutor rsyncExecutor;
 
-    public RsyncTaskHandler(TaskRepository taskRepository) {
+    public FileCopyTaskHandler(TaskRepository taskRepository) {
         super(taskRepository);
         this.rsyncExecutor = new RsyncExecutor();
     }
@@ -54,14 +54,6 @@ public class RsyncTaskHandler extends BaseTaskHandler<FileCopyParams> {
             throw new IllegalArgumentException("目标目录不存在：" + targetDir);
         }
 
-        // 检查目标文件是否已存在
-        for (Path sourcePath : sourcePaths) {
-            Path destinationPath = targetDir.resolve(sourcePath.getFileName());
-            if (Files.exists(destinationPath)) {
-                throw new IllegalArgumentException("目标文件已存在：" + destinationPath);
-            }
-        }
-
         log.info("开始复制 {} 个文件到目标目录: {}", sourcePaths.size(), targetDir);
         updateProgress(task, 0, "开始复制...");
         taskRepository.updateTask(task);
@@ -77,13 +69,13 @@ public class RsyncTaskHandler extends BaseTaskHandler<FileCopyParams> {
                 .removeSource(false)
                 .build();
 
-        rsyncExecutor.execute(options, (rsyncProgress) -> {
+        RsyncExecutor.RsyncProgress progress = rsyncExecutor.execute(options, (rsyncProgress) -> {
             updateProgress(task, rsyncProgress.getPercentage(), rsyncProgress.generateMsg());
             taskRepository.updateTask(task);
         });
 
-        log.info("复制完成");
-        task.markAsCompleted("复制完成");
+        log.info(progress.generateMsg());
+        task.markAsCompleted(progress.generateMsg());
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RsyncTaskHandlerTest extends BaseTaskHandlerTest<FileCopyParams> {
+class FileCopyTaskHandlerTest extends BaseTaskHandlerTest<FileCopyParams> {
 
     @TempDir
     Path tempDir;
@@ -53,7 +53,7 @@ class RsyncTaskHandlerTest extends BaseTaskHandlerTest<FileCopyParams> {
 
     @Override
     protected void setupTestHandler() {
-        taskHandler = new RsyncTaskHandler(taskRepository);
+        taskHandler = new FileCopyTaskHandler(taskRepository);
     }
 
     @Override
@@ -177,28 +177,7 @@ class RsyncTaskHandlerTest extends BaseTaskHandlerTest<FileCopyParams> {
         verifyTaskFailure(task, "源文件不存在：" + nonExistentFile);
     }
 
-    @Test
-    void testCopyToExistingFile() throws IOException {
-        // 在目标目录创建同名文件
-        Files.write(targetDir.resolve(sourceFile.getFileName()), "existing content".getBytes());
-        
-        // 准备测试数据
-        JSONObject payload = new JSONObject();
-        payload.put("selectedPaths", List.of(sourceFile.toString()));
-        payload.put("targetDir", targetDir.toString());
-        Task task = createTestTask(payload);
 
-        // 执行测试
-        taskHandler.handle(task);
-
-        // 验证任务失败
-        verifyTaskFailure(task, "目标文件已存在：" + targetDir.resolve(sourceFile.getFileName()));
-        assertEquals(
-            "existing content",
-            new String(Files.readAllBytes(targetDir.resolve(sourceFile.getFileName()))),
-            "目标文件内容不应改变"
-        );
-    }
 
     @Test
     void testTaskDescription() {

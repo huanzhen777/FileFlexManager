@@ -37,7 +37,8 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
     private final FileIndexRepository fileIndexRepository;
     private final FileTagRepository fileTagRepository;
 
-    public FileMoveTaskHandler(TaskRepository taskRepository, FileIndexRepository fileIndexRepository, FileTagRepository fileTagRepository) {
+    public FileMoveTaskHandler(TaskRepository taskRepository, FileIndexRepository fileIndexRepository,
+            FileTagRepository fileTagRepository) {
         super(taskRepository);
         this.rsyncExecutor = new RsyncExecutor();
         this.fileIndexRepository = fileIndexRepository;
@@ -48,7 +49,6 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
     public TaskType getTaskType() {
         return TaskType.FILE_MOVE;
     }
-
 
     @Override
     protected void doHandle(Task task) throws Exception {
@@ -117,13 +117,14 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
             // 尝试直接移动
             try {
                 if (params.isOverwrite()) {
-                    Files.move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                    Files.move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.ATOMIC_MOVE);
                 } else {
                     Files.move(sourcePath, destinationPath, StandardCopyOption.ATOMIC_MOVE);
                 }
                 movedSize += currentSize;
                 updateProgressIfNeeded(task);
-                
+
                 // 记录成功移动的文件
                 successfulMoves.put(sourcePath, destinationPath);
                 // 删除文件索引
@@ -134,6 +135,7 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
             }
         }
 
+        RsyncExecutor.RsyncProgress progress = null;
         // 如果有需要用rsync移动的文件，批量处理
         if (!rsyncPaths.isEmpty()) {
             log.info("使用rsync批量移动 {} 文件", JSON.toJSONString(rsyncPaths));
@@ -146,7 +148,7 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
                     .removeSource(true)
                     .build();
 
-            rsyncExecutor.execute(options, (rsyncProgress) -> {
+            progress = rsyncExecutor.execute(options, (rsyncProgress) -> {
                 updateProgress(task, rsyncProgress.getPercentage(), rsyncProgress.generateMsg());
                 taskRepository.updateTask(task);
             });
@@ -168,8 +170,12 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
             log.info("文件标签处理完成");
         }
 
-        log.info("移动完成");
-        task.markAsCompleted("移动完成");
+        String msg = "移动完成";
+        if (progress != null) {
+            msg = progress.generateMsg();
+        }
+        log.info(msg);
+        task.markAsCompleted(msg);
     }
 
     private void collectSourceTags(Path sourcePath, boolean isDirectory, Map<String, List<FileTag>> sourceTagsMap) {
@@ -230,11 +236,11 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
 
     private void moveAllFileTags(Map<String, List<FileTag>> sourceTagsMap, Map<Path, Path> pathMappings) {
         Map<String, FileIndex> newIndexCache = new HashMap<>();
-        
+
         for (Map.Entry<String, List<FileTag>> entry : sourceTagsMap.entrySet()) {
             String oldPath = entry.getKey();
             List<FileTag> tags = entry.getValue();
-            
+
             // 找到对应的路径映射
             Path sourcePath = null;
             Path destinationPath = null;
@@ -245,7 +251,7 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
                     break;
                 }
             }
-            
+
             if (sourcePath == null || destinationPath == null) {
                 continue;
             }
@@ -258,7 +264,7 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
                 String relativePath = sourcePath.relativize(Paths.get(oldPath)).toString();
                 newPath = destinationPath.resolve(relativePath).toString();
             }
-            
+
             // 检查缓存中是否已存在新的文件索引
             FileIndex newIndex = newIndexCache.get(newPath);
             if (newIndex == null) {
@@ -345,4 +351,4 @@ public class FileMoveTaskHandler extends BaseTaskHandler<FileMoveParams> {
         FileMoveParams params = parseTaskParam(task);
         return StrUtil.format("批量移动: {} 个文件/目录 -> {}", params.getSelectedPaths().size(), params.getTargetDir());
     }
-} 
+}

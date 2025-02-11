@@ -94,7 +94,7 @@ public class RsyncExecutor {
     private List<String> statsInfo = new ArrayList<>();
     private boolean isCollectingStats = false;
 
-    public void execute(RsyncOptions options, Consumer<RsyncProgress> progressCallback) throws Exception {
+    public RsyncProgress execute(RsyncOptions options, Consumer<RsyncProgress> progressCallback) throws Exception {
         List<String> command = buildRsyncCommand(options);
         log.debug("执行rsync命令: {}", String.join(" ", command));
 
@@ -161,6 +161,7 @@ public class RsyncExecutor {
         if (exitCode != 0) {
             throw new RuntimeException("rsync 执行失败，退出码: " + exitCode);
         }
+        return progressBuilder.build();
     }
 
     private List<String> buildRsyncCommand(RsyncOptions options) {
