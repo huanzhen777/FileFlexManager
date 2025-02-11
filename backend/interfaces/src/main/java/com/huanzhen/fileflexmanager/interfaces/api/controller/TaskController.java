@@ -8,6 +8,7 @@ import com.huanzhen.fileflexmanager.domain.model.enums.TaskType;
 import com.huanzhen.fileflexmanager.interfaces.convert.TaskConvert;
 import com.huanzhen.fileflexmanager.domain.model.BaseResponse;
 import com.huanzhen.fileflexmanager.interfaces.model.req.CreateScheduledTaskRequest;
+import com.huanzhen.fileflexmanager.domain.model.req.UpdateScheduledTaskRequest;
 import com.huanzhen.fileflexmanager.interfaces.model.resp.TaskResponse;
 import com.huanzhen.fileflexmanager.interfaces.model.resp.TaskTypeResponse;
 import org.springframework.web.bind.annotation.*;
@@ -118,5 +119,11 @@ public class TaskController {
                         .map(taskConvert::toTaskTypeResponse)
                         .collect(Collectors.toList())
         );
+    }
+
+    @PostMapping("/updateScheduledTask")
+    public BaseResponse<TaskResponse> updateScheduledTask(@RequestBody UpdateScheduledTaskRequest request) {
+        Task task = taskService.updateScheduledTask(request);
+        return BaseResponse.success(taskConvert.toTaskResponse(task));
     }
 } 

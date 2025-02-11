@@ -6,10 +6,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.huanzhen.fileflexmanager.domain.model.entity.Task;
 import com.huanzhen.fileflexmanager.domain.model.enums.TaskType;
+import com.huanzhen.fileflexmanager.domain.model.req.UpdateScheduledTaskRequest;
 import com.huanzhen.fileflexmanager.domain.repository.TaskRepository;
 import com.huanzhen.fileflexmanager.domain.service.TaskHandler;
 import com.huanzhen.fileflexmanager.domain.service.TaskHandlerRegistry;
+
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -192,6 +195,16 @@ public class TaskApplicationService {
             throw new IllegalArgumentException("非定时任务无法删除: " + taskId);
         }
         taskRepository.deleteById(taskId);
+    }
+
+    public Task updateScheduledTask(UpdateScheduledTaskRequest request) {
+        Task task = taskRepository.findById(request.id());
+        Assert.notNull(task, "任务不存在: " + request.id());
+        task.setCronExpression(request.cronExpression());
+        task.setDesc(request.desc());
+        task.setPayload(request.payload());
+        taskRepository.updateTask(task);
+        return taskRepository.findById(request.id());
     }
 
 

@@ -31,6 +31,14 @@ export interface CreateScheduledTaskRequest {
     desc?: string;
 }
 
+export interface UpdateScheduledTaskRequest {
+    id: number;
+    type: string;
+    payload: Record<string, any>;
+    cronExpression: string;
+    desc?: string;
+}
+
 export interface TaskParamOption {
     label: string;
     value: string;

@@ -254,6 +254,60 @@
           title="选择任务类型"
       />
     </van-popup>
+
+    <!-- 添加编辑定时任务弹窗 -->
+    <van-dialog
+        v-model:show="editTaskVisible"
+        title="编辑定时任务"
+        @confirm="submitEditTask"
+        show-cancel-button
+    >
+      <van-form>
+        <!-- 任务描述输入 -->
+        <van-field
+            v-model="editTaskForm.desc"
+            label="任务描述"
+            type="textarea"
+            rows="2"
+            placeholder="请输入任务描述"
+            :rules="[{ required: true, message: '请输入任务描述' }]"
+        />
+
+        <!-- 任务参数表单 -->
+        <task-param-form
+            v-if="selectedTaskType"
+            ref="editParamFormRef"
+            :params="selectedTaskType.paramConfigs"
+            :default-values="editTaskForm.payload"
+        />
+
+        <!-- Cron表达式输入 -->
+        <van-field
+            v-model="editTaskForm.cronExpression"
+            label="Cron表达式"
+            placeholder="输入Cron表达式"
+        >
+          <template #right-icon>
+            <van-popover
+                v-model:show="showCronHelp"
+                placement="bottom-end"
+                theme="dark"
+            >
+              <div class="cron-help">
+                <p>常用Cron表达式：</p>
+                <p>每分钟：0 * * * * *</p>
+                <p>每小时：0 0 * * * *</p>
+                <p>每天凌晨：0 0 0 * * *</p>
+                <p>每周一凌晨：0 0 0 * * MON</p>
+              </div>
+              <template #reference>
+                <van-icon name="question-o"/>
+              </template>
+            </van-popover>
+          </template>
+        </van-field>
+      </van-form>
+    </van-dialog>
   </div>
 </template>
 
@@ -289,6 +343,17 @@ const scheduledForm = ref({
 const scheduledTaskTypes = ref<TaskType[]>([])
 const taskTypeVisible = ref(false)
 const showCronHelp = ref(false)
+
+// 添加编辑相关的状态
+const editTaskVisible = ref(false);
+const editTaskForm = ref({
+  id: 0,
+  type: '',
+  desc: '',
+  cronExpression: '',
+  payload: {} as Record<string, any>
+});
+const editParamFormRef = ref<InstanceType<typeof TaskParamForm> | null>(null);
 
 // 过滤任务
 const filteredTasks = computed(() => {
@@ -380,7 +445,11 @@ watch(activeTab, () => {
 // 显示任务详情
 const showTaskDetail = (task: Task) => {
   currentTask.value = task
-  taskDetailVisible.value = true
+  if (task.scheduled) {
+    showEditTask()
+  } else {
+    taskDetailVisible.value = true
+  }
 }
 
 // 取消任务
@@ -619,6 +688,73 @@ const getStatusText = (status: string) => {
       return status
   }
 }
+
+// 显示编辑任务弹窗
+const showEditTask = () => {
+  if (!currentTask.value) return;
+  
+  // 查找对应的任务类型配置
+  const taskType = scheduledTaskTypes.value.find(t => t.type === currentTask.value?.type);
+  if (!taskType) {
+    showToast('无法找到任务类型配置');
+    return;
+  }
+  
+  selectedTaskType.value = taskType;
+  editTaskForm.value = {
+    id: currentTask.value.id,
+    type: currentTask.value.type,
+    desc: currentTask.value.desc,
+    cronExpression: currentTask.value.cronExpression || '',
+    payload: (currentTask.value as any).payload || {}
+  };
+  
+  editTaskVisible.value = true;
+};
+
+// 提交编辑任务
+const submitEditTask = async () => {
+  try {
+    // 验证必填字段
+    if (!editTaskForm.value.cronExpression) {
+      showToast('请输入Cron表达式');
+      return;
+    }
+
+    // 获取参数表单数据
+    const params = editParamFormRef.value?.getFormData();
+    if (!params) {
+      showToast('请填写任务参数');
+      return;
+    }
+
+    // 验证必填参数
+    if (selectedTaskType.value?.paramConfigs) {
+      const requiredParams = selectedTaskType.value.paramConfigs.filter(param => param.required);
+      for (const param of requiredParams) {
+        if (!params[param.key]) {
+          showToast(`请填写${param.name}`);
+          return;
+        }
+      }
+    }
+
+    // 提交更新
+    await taskService.updateScheduledTask({
+      id: editTaskForm.value.id,
+      type: editTaskForm.value.type,
+      cronExpression: editTaskForm.value.cronExpression,
+      desc: editTaskForm.value.desc,
+      payload: params
+    });
+
+    showToast('更新成功');
+    editTaskVisible.value = false;
+    loadTasks();
+  } catch (error: any) {
+    showToast(error.message || '更新失败');
+  }
+};
 </script>
 
 <style scoped>
@@ -643,6 +779,11 @@ const getStatusText = (status: string) => {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
+  align-items: center;
+}
+
+.detail-header .van-button {
+  margin-left: auto;
 }
 
 .progress-section {

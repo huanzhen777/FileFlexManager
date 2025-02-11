@@ -1,5 +1,5 @@
 import api, {Page} from './config';
-import {CreateScheduledTaskRequest, Task, TaskQueryParams, TaskType} from "@/types/task.ts";
+import {CreateScheduledTaskRequest, Task, TaskQueryParams, TaskType, UpdateScheduledTaskRequest} from "@/types/task.ts";
 
 export const taskService = {
     // 获取所有运行中的任务
@@ -65,5 +65,13 @@ export const taskService = {
     // 添加删除定时任务的方法
     async deleteScheduledTask(id: number): Promise<void> {
         await api.delete(`/api/tasks/scheduled/${id}`);
+    },
+
+    /**
+     * 更新定时任务
+     */
+    async updateScheduledTask(request: UpdateScheduledTaskRequest): Promise<Task> {
+        const response = await api.post(`/api/tasks/updateScheduledTask`, request);
+        return response.data;
     }
 }; 
