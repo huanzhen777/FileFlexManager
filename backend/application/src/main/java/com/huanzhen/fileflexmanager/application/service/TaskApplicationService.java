@@ -113,7 +113,13 @@ public class TaskApplicationService {
 
         // 如果任务正在运行，先尝试通知处理器取消任务
         TaskHandler handler = executeHandlers.get(taskId);
-        Assert.notNull(handler, "当前不支持取消");
+        if (handler == null) {
+            // 如果从 executeHandlers 获取不到，说明任务已异常终止
+            task.markAsFailed("任务异常终止");
+            taskRepository.updateTask(task);
+            return;
+        }
+
         handler.cancel(task);
     }
 
